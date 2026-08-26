@@ -1,0 +1,19 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+
+# Local configuration may contain names, phone numbers, and private paths.
+.env
+
+# Never commit local Messages data or private exports.
+chat.db*
+*.sqlite
+*.sqlite3
+Attachments/
+attachments/
+screenshots/
+
+# Scratch/debug output.
+tmp/
+debug/
+*.log
