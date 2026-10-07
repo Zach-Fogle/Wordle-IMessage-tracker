@@ -1,25 +1,47 @@
-# Wordle Messages Leaderboard
+# Wordle iMessage Tracker
 
-Builds a small Wordle leaderboard from macOS Messages text shares and cropped board screenshots.
+A local Python utility that builds a two-player Wordle leaderboard from macOS Messages text shares and cropped board screenshots. It replaces manually comparing results scattered through a conversation.
 
-## Local Configuration
+## How it works
 
-The script is GitHub-safe by default: names and phone numbers are placeholders. For local use, copy `.env.example` to `.env` and fill in your real values:
-
-```bash
-pip install -r requirements.txt
-cp .env.example .env
-python3 wordle_script.py
+```mermaid
+flowchart LR
+  DB[Local Messages SQLite database] --> Text[Parse Wordle text shares]
+  DB --> Images[Inspect board screenshots]
+  Images --> CV[OpenCV and Pillow heuristics]
+  Text --> Results[Match players and puzzle results]
+  CV --> Results
+  Results --> Board[Terminal leaderboard]
 ```
 
-You can also set the same values as environment variables if you prefer. `.env` is ignored by Git.
+The implementation is in `wordle_script.py`. It loads local configuration, queries Messages data, extracts scores and groups results for comparison. Dependencies are NumPy, OpenCV and Pillow; SQLite access uses Python standard-library support.
 
-## Privacy Notes
+## Local setup
 
-Do not commit your Messages database, exported attachments, screenshots, or `.env` file. The included `.gitignore` excludes the common local/private files.
+Use macOS and Python 3.9 or newer. Run these commands from the repository directory:
 
-The script does not print screenshot filenames; screenshot rows are shown as `[screenshot attachment]`.
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+cp .env.example .env
+python wordle_script.py
+```
 
-## macOS Permission
+Before running the script, edit `.env` with the player names, second player handle and optional database path documented in `.env.example`. Environment variables can also supply these values.
 
-Reading `~/Library/Messages/chat.db` may require giving your terminal Full Disk Access in System Settings.
+Reading `~/Library/Messages/chat.db` may require macOS Full Disk Access for the terminal. Review that permission before granting it; it allows broad filesystem access.
+
+## Limitations
+
+- Requires locally available macOS Messages data and attachments.
+- Screenshot interpretation uses heuristics and may misread different crops, layouts or themes.
+- Player matching is designed for the current two-player use case.
+- Date handling uses an America/New_York timezone and a configured puzzle-date anchor in the script.
+- This is a personal local utility, not a hosted service; there is no automated test suite in this repository.
+
+## Privacy and demos
+
+Do not commit Messages databases, exported attachments, real message screenshots or `.env`. The repository supplies placeholder configuration and ignores common private files. Screenshot rows are labeled `[screenshot attachment]` rather than printing attachment filenames.
+
+Use synthetic data for a public demo. Review terminal output before sharing it because player names and results can identify people.
